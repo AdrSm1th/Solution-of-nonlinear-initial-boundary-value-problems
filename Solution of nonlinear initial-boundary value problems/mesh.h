@@ -1,4 +1,4 @@
-//mesh.h
+//Mesh.h
 
 #pragma once
 
@@ -30,6 +30,7 @@ public:
 	bool readMesh(const std::string &filename);
 	void generateUniformMesh();
 	int genNumNodes() const;
+	int genNumElems() const;
 	double getNodeCoord(int node_id) const;
 	std::vector<int> getElementNodes(int elem_id) const;
 	bool isBoundary(int node_id) const;

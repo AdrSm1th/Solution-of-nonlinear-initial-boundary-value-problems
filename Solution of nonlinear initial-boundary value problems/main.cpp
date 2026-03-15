@@ -1,7 +1,7 @@
 ﻿//main.cpp
 
 #include <iostream>
-#include "mesh.h"
+#include "Mesh.h"
 
 int main()
 {

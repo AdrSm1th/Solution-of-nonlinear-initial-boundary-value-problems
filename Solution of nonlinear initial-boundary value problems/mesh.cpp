@@ -1,23 +1,22 @@
-//mesh.cpp
+//Mesh.cpp
 
 #include <fstream>
 #include <iostream>
-#include "mesh.h"
+#include "Mesh.h"
 
 bool Mesh::readMesh(const std::string& filename)
 {
 	std::ifstream input(filename);
 	input >> a_ >> b_ >> n_;
 	nodes_.resize(n_);
-	elements_.resize(n_, std::vector<int>(0));
+	elements_.resize(n_ - 2, std::vector<int>(0));
 
-	for (int i = 0; i < n_ - 1; i++)
+	for (int i = 0; i < n_ - 2; i++)
 	{
 		elements_[i].push_back(i);
 		elements_[i].push_back(i + 1);
+		elements_[i].push_back(i + 2);
 	}
-	elements_[n_ - 1].push_back(n_ - 2);
-	elements_[n_ - 1].push_back(n_ - 1);
 
 	input >> left_.type >> right_.type;
 
@@ -84,6 +83,8 @@ void Mesh::generateUniformMesh()
 }
 
 int Mesh::genNumNodes() const { return n_; }
+
+int Mesh::genNumElems() const { return n_ - 2; }
 
 double Mesh::getNodeCoord(int node_id) const { return nodes_[node_id]; }
 
