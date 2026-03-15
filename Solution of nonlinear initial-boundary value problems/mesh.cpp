@@ -7,7 +7,7 @@
 bool Mesh::readMesh(const std::string& filename)
 {
 	std::ifstream input(filename);
-	input >> a_ >> b_ >> n_;
+	input >> a_ >> b_ >> n_ >> gamma_;
 	nodes_.resize(n_);
 	elements_.resize(n_ - 2, std::vector<int>(0));
 
@@ -93,3 +93,7 @@ std::vector<int> Mesh::getElementNodes(int elem_id) const { return elements_[ele
 bool Mesh::isBoundary(int node_id) const { return node_id == 0 || node_id == n_ - 1; }
 
 BoundaryCondition Mesh::getBoundaryCondition(bool left) const { return left ? left_ : right_; }
+
+double Mesh::lambda(double u) const { return u; }
+
+double Mesh::f(double x) const { return x; }

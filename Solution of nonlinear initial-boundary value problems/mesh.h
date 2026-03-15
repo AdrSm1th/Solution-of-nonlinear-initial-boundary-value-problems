@@ -19,14 +19,14 @@ public:
 class Mesh
 {
 private:
-	double a_, b_;
+	double a_, b_, gamma_;
 	int n_;
 	std::vector<double> nodes_;
 	std::vector<std::vector<int>> elements_;
 	BoundaryCondition left_, right_;
 
 public:
-	Mesh() : a_(0.0), b_(0.0), n_(0), left_(), right_(){}
+	Mesh() : a_(0.0), b_(0.0), n_(0), gamma_(0.0), left_(), right_(){}
 	bool readMesh(const std::string &filename);
 	void generateUniformMesh();
 	int genNumNodes() const;
@@ -35,4 +35,6 @@ public:
 	std::vector<int> getElementNodes(int elem_id) const;
 	bool isBoundary(int node_id) const;
 	BoundaryCondition getBoundaryCondition(bool left) const;
+	double f(double x) const;
+	double lambda(double u) const;
 };
