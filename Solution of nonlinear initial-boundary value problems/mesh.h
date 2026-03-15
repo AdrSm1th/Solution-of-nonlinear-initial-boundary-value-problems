@@ -5,12 +5,33 @@
 #include <string>
 #include <vector>
 
-class Mesh
+class BoundaryCondition
 {
 public:
+	int type;
+
+	double u_g;
+	double theta;
+	double beta;
+	double u_beta;
+};
+
+class Mesh
+{
+private:
+	double a_, b_;
+	int n_;
 	std::vector<double> nodes_;
 	std::vector<std::vector<int>> elements_;
-	//std::map<int, BoundaryCondition> boundary_nodes_;
+	BoundaryCondition left_, right_;
 
-	void readMesh(const std::string &filename);
+public:
+	Mesh() : a_(0.0), b_(0.0), n_(0), left_(), right_(){}
+	bool readMesh(const std::string &filename);
+	void generateUniformMesh();
+	int genNumNodes() const;
+	double getNodeCoord(int node_id) const;
+	std::vector<int> getElementNodes(int elem_id) const;
+	bool isBoundary(int node_id) const;
+	BoundaryCondition getBoundaryCondition(bool left) const;
 };

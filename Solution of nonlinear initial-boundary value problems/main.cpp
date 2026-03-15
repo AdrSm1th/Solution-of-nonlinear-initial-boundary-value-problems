@@ -1,8 +1,13 @@
 ﻿//main.cpp
 
 #include <iostream>
+#include "mesh.h"
 
 int main()
 {
-    std::cout << "Hello World!\n";
+   Mesh mesh;
+   mesh.readMesh("mesh.txt");
+   mesh.generateUniformMesh();
+
+   return 0;
 }
