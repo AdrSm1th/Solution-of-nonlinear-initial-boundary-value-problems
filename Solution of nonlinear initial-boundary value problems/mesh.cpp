@@ -8,6 +8,11 @@ bool Mesh::readMesh(const std::string& filename)
 {
 	std::ifstream input(filename);
 	input >> a_ >> b_ >> n_ >> gamma_;
+	if (n_ < 3)
+	{
+		std::cout << "number of nodes must be more than 3\n";
+		return false;
+	}
 	nodes_.resize(n_);
 	elements_.resize(n_ - 2, std::vector<int>(0));
 
@@ -82,9 +87,9 @@ void Mesh::generateUniformMesh()
 	nodes_[n_ - 1] = b_;
 }
 
-int Mesh::genNumNodes() const { return n_; }
+int Mesh::getNumNodes() const { return n_; }
 
-int Mesh::genNumElems() const { return n_ - 2; }
+int Mesh::getNumElems() const { return n_ - 2; }
 
 double Mesh::getNodeCoord(int node_id) const { return nodes_[node_id]; }
 

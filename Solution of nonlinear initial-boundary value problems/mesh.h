@@ -29,8 +29,8 @@ public:
 	Mesh() : a_(0.0), b_(0.0), n_(0), gamma_(0.0), left_(), right_(){}
 	bool readMesh(const std::string &filename);
 	void generateUniformMesh();
-	int genNumNodes() const;
-	int genNumElems() const;
+	int getNumNodes() const;
+	int getNumElems() const;
 	double getNodeCoord(int node_id) const;
 	std::vector<int> getElementNodes(int elem_id) const;
 	bool isBoundary(int node_id) const;

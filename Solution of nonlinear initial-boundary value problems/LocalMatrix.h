@@ -14,10 +14,11 @@ struct LocalMatrices
 
 class LocalAssembler
 {
-public:
+private:
 	Mesh *mesh_;
 	BasisFunction *basis_;
 
+public:
 	LocalAssembler(Mesh &mesh, BasisFunction &basis)
 	{
 		mesh_ = &mesh;

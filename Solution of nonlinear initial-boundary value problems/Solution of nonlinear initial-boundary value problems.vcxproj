@@ -124,12 +124,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BasisFunctions.cpp" />
+    <ClCompile Include="FEMsolver.cpp" />
     <ClCompile Include="LocalMatrix.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasisFunctions.h" />
+    <ClInclude Include="FEMsolver.h" />
     <ClInclude Include="LocalMatrix.h" />
     <ClInclude Include="Mesh.h" />
   </ItemGroup>
