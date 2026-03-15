@@ -7,6 +7,6 @@
 class BasisFunction
 {
 public:
-	std::vector<double> evaluateBasis(double x) const;
-	std::vector<double> evalueteDerivatises(double x) const;
+	std::vector<double> evaluateBasis(double xi) const;
+	std::vector<double> evalueteDerivatives(double xi) const;
 };
