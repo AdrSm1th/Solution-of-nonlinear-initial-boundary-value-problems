@@ -1,6 +1,5 @@
 //FEMsolver.cpp
 
-#include <iostream>
 #include "FEMsolver.h"
 
 int FEMsolver::index(int i, int j) const
@@ -129,6 +128,8 @@ void FEMsolver::applyBoundaryCondition()
 
 bool FEMsolver::solveLU()
 {
+	FEMsolver Acopy = (*this);
+
 	int n = mesh_->getNumNodes();
 	for (int k = 0; k < n; ++k) 
 	{
@@ -140,10 +141,10 @@ bool FEMsolver::solveLU()
 			{
 				if (std::abs(t - k) <= matrix_bandwidth_ && std::abs(t - j) <= matrix_bandwidth_) 
 				{
-					sum += (*this)(k, t) * (*this)(t, j);
+					sum += Acopy(k, t) * Acopy(t, j);
 				}
 			}
-			(*this)(k, j) -= sum;
+			Acopy(k, j) -= sum;
 		}
 
 		for (int i = k + 1; i <= std::min(n - 1, k + matrix_bandwidth_); ++i)
@@ -153,16 +154,16 @@ bool FEMsolver::solveLU()
 			{
 				if (std::abs(t - i) <= matrix_bandwidth_ && std::abs(t - k) <= matrix_bandwidth_)
 				{
-					sum += (*this)(i, t) * (*this)(t, k);
+					sum += Acopy(i, t) * Acopy(t, k);
 				}
 			}
 
-			if (std::abs((*this)(k, k)) < 1e-15)
+			if (std::abs(Acopy(k, k)) < 1e-15)
 			{
 				return false;
 			}
 
-			(*this)(i, k) = ((*this)(i, k) - sum) / (*this)(k, k);
+			Acopy(i, k) = (Acopy(i, k) - sum) / Acopy(k, k);
 		}
 	}
 
@@ -172,7 +173,7 @@ bool FEMsolver::solveLU()
 		double sum = 0.0;
 		for (int j = std::max(0, i - matrix_bandwidth_); j < i; ++j)
 		{
-			sum += (*this)(i, j) * y[j];
+			sum += Acopy(i, j) * y[j];
 		}
 		y[i] = global_b_[i] - sum;
 	}
@@ -182,15 +183,46 @@ bool FEMsolver::solveLU()
 		double sum = 0.0;
 		for (int j = i + 1; j <= std::min(n - 1, i + matrix_bandwidth_); ++j)
 		{
-			sum += (*this)(i, j) * solution_[j];
+			sum += Acopy(i, j) * solution_[j];
 		}
 
-		if (std::abs((*this)(i, i)) < 1e-15) throw std::runtime_error("Zero diagonal element in U");
+		if (std::abs(Acopy(i, i)) < 1e-15) throw std::runtime_error("Zero diagonal element in U");
 
-		solution_[i] = (y[i] - sum) / (*this)(i, i);
+		solution_[i] = (y[i] - sum) / Acopy(i, i);
 	}
 
 	return true;
 }
 
 std::vector<double> FEMsolver::getSolution() const { return solution_; }
+
+double FEMsolver::computeResidualNorm()
+{
+	int n = mesh_->getNumNodes();
+	std::vector<double> Aq(n);
+
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			Aq[j] += (*this) (i, j) * solution_[j];
+		}
+	}
+
+	double diff = 0, bNorm = 0;
+
+	for (int i = 0; i < n; i++)
+	{
+		double r = Aq[i] - global_b_[i];
+		diff += r * r;
+	}
+	diff = sqrt(diff);
+
+	for (int i = 0; i < n; i++)
+	{
+		bNorm += global_b_[i] * global_b_[i];
+	}
+	bNorm = sqrt(bNorm);
+
+	return diff / bNorm;
+}

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
 #include "Mesh.h"
 #include "LocalMatrix.h"
 #include "BasisFunctions.h"
@@ -52,4 +53,6 @@ public:
 	bool solveLU();
 
 	std::vector<double> getSolution() const;
+
+	double computeResidualNorm();
 };

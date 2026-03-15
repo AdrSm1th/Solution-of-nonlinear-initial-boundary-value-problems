@@ -30,6 +30,9 @@
     <ClCompile Include="FEMsolver.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="NonlinearSolver.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h">
@@ -42,6 +45,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="FEMsolver.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="NonlinearSolver.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
