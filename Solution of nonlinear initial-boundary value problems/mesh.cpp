@@ -97,3 +97,5 @@ BoundaryCondition Mesh::getBoundaryCondition(bool left) const { return left ? le
 double Mesh::lambda(double u) const { return u; }
 
 double Mesh::f(double x) const { return x; }
+
+double Mesh::gamma() { return gamma_; }

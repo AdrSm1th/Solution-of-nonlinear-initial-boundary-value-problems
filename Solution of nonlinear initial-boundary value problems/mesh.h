@@ -37,4 +37,5 @@ public:
 	BoundaryCondition getBoundaryCondition(bool left) const;
 	double f(double x) const;
 	double lambda(double u) const;
+	double gamma();
 };
