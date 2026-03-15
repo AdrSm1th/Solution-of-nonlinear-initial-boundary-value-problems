@@ -57,4 +57,6 @@ LocalMatrices LocalAssembler::simpleIteration(int elem_id, const std::vector<dou
 			matrices.b[i] += mesh_->f(x[iF]) * psi[i] * w[iF];
 		}
 	}
+
+	return matrices;
 }
