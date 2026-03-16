@@ -14,13 +14,11 @@ bool Mesh::readMesh(const std::string& filename)
 		return false;
 	}
 	nodes_.resize(n_);
-	elements_.resize(n_ - 2, std::vector<int>(0));
+	elements_.resize(n_ - 2);
 
 	for (int i = 0; i < n_ - 2; i++)
 	{
-		elements_[i].push_back(i);
-		elements_[i].push_back(i + 1);
-		elements_[i].push_back(i + 2);
+		elements_[i] = { i, i + 1, i + 2 };
 	}
 
 	input >> left_.type >> right_.type;
@@ -99,8 +97,8 @@ bool Mesh::isBoundary(int node_id) const { return node_id == 0 || node_id == n_ 
 
 BoundaryCondition Mesh::getBoundaryCondition(bool left) const { return left ? left_ : right_; }
 
-double Mesh::lambda(double u) const { return u; }
+double Mesh::lambda(double u) const { return 1 + u; }
 
-double Mesh::f(double x) const { return x; }
+double Mesh::f(double x) const { return -1 + x; }
 
 double Mesh::gamma() { return gamma_; }

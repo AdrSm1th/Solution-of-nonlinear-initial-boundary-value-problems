@@ -6,7 +6,7 @@ int FEMsolver::index(int i, int j) const
 {
 	if (std::abs(i - j) > matrix_bandwidth_) return -1;
 
-	int diag_offset = j - i;
+	int diag_offset = i - j;
 
 	int diag_num = diag_offset + matrix_bandwidth_;
 
@@ -55,6 +55,14 @@ void FEMsolver::applyBoundaryCondition()
 				{
 					if (std::abs(j - idx) <= matrix_bandwidth_) (*this)(idx, j) = 0;
 				}
+				for (int i = 0; i < n; i++)
+				{
+					if (std::abs(i - idx) <= matrix_bandwidth_)
+					{
+						global_b_[i] -= (*this)(i, idx) * cond.u_g;
+						(*this)(i, idx) = 0;
+					}
+				}
 				(*this)(idx, idx) = 1;
 				global_b_[idx] = cond.u_g;
 
@@ -65,26 +73,27 @@ void FEMsolver::applyBoundaryCondition()
 				auto elem_nodes = mesh_->getElementNodes(idx);
 
 				double x1 = mesh_->getNodeCoord(elem_nodes[0]);
-				double x2 = mesh_->getNodeCoord(elem_nodes[2]);
-				double x3 = mesh_->getNodeCoord(elem_nodes[1]);
+				double x2 = mesh_->getNodeCoord(elem_nodes[1]);
+				double x3 = mesh_->getNodeCoord(elem_nodes[2]);
 
 				std::vector<double> x(3), w(3);
 
 				const std::vector<double> gauss_w = { 0.555555555555556, 0.888888888888889, 0.555555555555556 };
 
-				x[0] = (x1 + x2) / 2 - (x2 - x1) / 2 * 0.774596669241483;
-				x[1] = (x1 + x2) / 2;
-				x[2] = (x1 + x2) / 2 + (x2 - x1) / 2 * 0.774596669241483;
+				x[0] = (x1 + x3) / 2 - (x3 - x1) / 2 * 0.774596669241483;
+				x[1] = (x1 + x3) / 2;
+				x[2] = (x1 + x3) / 2 + (x3 - x1) / 2 * 0.774596669241483;
 
-				w[0] = (x2 - x1) / 2 * 0.555555555555556;
-				w[1] = (x2 - x1) / 2 * 0.888888888888889;
-				w[2] = (x2 - x1) / 2 * 0.555555555555556;
+				w[0] = (x3 - x1) / 2 * 0.555555555555556;
+				w[1] = (x3 - x1) / 2 * 0.888888888888889;
+				w[2] = (x3 - x1) / 2 * 0.555555555555556;
 
 				int local_idx = (idx == elem_nodes[0]) ? 0 :
 					(idx == elem_nodes[1]) ? 1 : 2;
 				for (int i = 0; i < 3; i++)
 				{
-					std::vector<double> psi = basis_->evaluateBasis(x[i], x1, x2, x3);
+					double xi = (2 * x[i] - (x1 + x3)) / (x3 - x1);
+					std::vector<double> psi = basis_->evaluateBasis(xi);
 					global_b_[idx] += cond.theta * psi[local_idx] * w[i];
 				}
 
@@ -96,26 +105,27 @@ void FEMsolver::applyBoundaryCondition()
 				auto elem_nodes = mesh_->getElementNodes(idx);
 
 				double x1 = mesh_->getNodeCoord(elem_nodes[0]);
-				double x2 = mesh_->getNodeCoord(elem_nodes[2]);
-				double x3 = mesh_->getNodeCoord(elem_nodes[1]);
+				double x2 = mesh_->getNodeCoord(elem_nodes[1]);
+				double x3 = mesh_->getNodeCoord(elem_nodes[2]);
 
 				std::vector<double> x(3), w(3);
 
 				const std::vector<double> gauss_w = { 0.555555555555556, 0.888888888888889, 0.555555555555556 };
 
-				x[0] = (x1 + x2) / 2 - (x2 - x1) / 2 * 0.774596669241483;
-				x[1] = (x1 + x2) / 2;
-				x[2] = (x1 + x2) / 2 + (x2 - x1) / 2 * 0.774596669241483;
+				x[0] = (x1 + x3) / 2 - (x3 - x1) / 2 * 0.774596669241483;
+				x[1] = (x1 + x3) / 2;
+				x[2] = (x1 + x3) / 2 + (x3 - x1) / 2 * 0.774596669241483;
 
-				w[0] = (x2 - x1) / 2 * 0.555555555555556;
-				w[1] = (x2 - x1) / 2 * 0.888888888888889;
-				w[2] = (x2 - x1) / 2 * 0.555555555555556;
+				w[0] = (x3 - x1) / 2 * 0.555555555555556;
+				w[1] = (x3 - x1) / 2 * 0.888888888888889;
+				w[2] = (x3 - x1) / 2 * 0.555555555555556;
 
 				int local_idx = (idx == elem_nodes[0]) ? 0 :
 					(idx == elem_nodes[1]) ? 1 : 2;
 				for (int i = 0; i < 3; i++)
 				{
-					std::vector<double> psi = basis_->evaluateBasis(x[i], x1, x2, x3);
+					double xi = (2 * x[i] - (x1 + x3)) / (x3 - x1);
+					std::vector<double> psi = basis_->evaluateBasis(xi);
 					(*this) (idx, idx) += cond.beta * psi[i] * psi[local_idx] * w[i];
 					global_b_[idx] += cond.u_beta * cond.beta * psi[local_idx] * w[i];
 				}
@@ -128,42 +138,41 @@ void FEMsolver::applyBoundaryCondition()
 
 bool FEMsolver::solveLU()
 {
-	FEMsolver Acopy = (*this);
+	std::vector<double> matrix_copy = global_A_;
 
 	int n = mesh_->getNumNodes();
 	for (int k = 0; k < n; ++k) 
 	{
-
-		for (int j = k; j <= std::min(n - 1, k + matrix_bandwidth_); ++j) 
+		for (int j = k; j <= std::min(k + matrix_bandwidth_, n - 1); ++j) 
 		{
 			double sum = 0.0;
 			for (int t = std::max(0, k - matrix_bandwidth_); t < k; ++t)
 			{
 				if (std::abs(t - k) <= matrix_bandwidth_ && std::abs(t - j) <= matrix_bandwidth_) 
 				{
-					sum += Acopy(k, t) * Acopy(t, j);
+					sum += (*this)(k, t) * (*this)(t, j);
 				}
 			}
-			Acopy(k, j) -= sum;
+			(*this)(k, j) -= sum;
 		}
 
-		for (int i = k + 1; i <= std::min(n - 1, k + matrix_bandwidth_); ++i)
+		for (int i = k + 1; i <= std::min(k + matrix_bandwidth_, n - 1); ++i)
 		{
 			double sum = 0.0;
 			for (int t = std::max(0, i - matrix_bandwidth_); t < k; ++t) 
 			{
 				if (std::abs(t - i) <= matrix_bandwidth_ && std::abs(t - k) <= matrix_bandwidth_)
 				{
-					sum += Acopy(i, t) * Acopy(t, k);
+					sum += (*this)(i, t) * (*this)(t, k);
 				}
 			}
 
-			if (std::abs(Acopy(k, k)) < 1e-15)
+			if (std::abs((*this)(k, k)) < 1e-15)
 			{
 				return false;
 			}
 
-			Acopy(i, k) = (Acopy(i, k) - sum) / Acopy(k, k);
+			(*this)(i, k) = ((*this)(i, k) - sum) / (*this)(k, k);
 		}
 	}
 
@@ -173,7 +182,7 @@ bool FEMsolver::solveLU()
 		double sum = 0.0;
 		for (int j = std::max(0, i - matrix_bandwidth_); j < i; ++j)
 		{
-			sum += Acopy(i, j) * y[j];
+			sum += (*this)(i, j) * y[j];
 		}
 		y[i] = global_b_[i] - sum;
 	}
@@ -183,13 +192,15 @@ bool FEMsolver::solveLU()
 		double sum = 0.0;
 		for (int j = i + 1; j <= std::min(n - 1, i + matrix_bandwidth_); ++j)
 		{
-			sum += Acopy(i, j) * solution_[j];
+			sum += (*this)(i, j) * solution_[j];
 		}
 
-		if (std::abs(Acopy(i, i)) < 1e-15) throw std::runtime_error("Zero diagonal element in U");
+		if (std::abs((*this)(i, i)) < 1e-15) throw std::runtime_error("Zero diagonal element in U");
 
-		solution_[i] = (y[i] - sum) / Acopy(i, i);
+		solution_[i] = (y[i] - sum) / (*this)(i, i);
 	}
+
+	global_A_ = matrix_copy;
 
 	return true;
 }
@@ -199,13 +210,15 @@ std::vector<double> FEMsolver::getSolution() const { return solution_; }
 double FEMsolver::computeResidualNorm()
 {
 	int n = mesh_->getNumNodes();
-	std::vector<double> Aq(n);
+	std::vector<double> Aq(n, 0);
 
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < n; i++)
 	{
-		for (int j = 0; j < n; j++)
+		int start_j = i - 2;
+		if (start_j < 0) start_j = 0;
+		for (int j = start_j; j <= std::min(n - 1, i + 2); j++)
 		{
-			Aq[j] += (*this) (i, j) * solution_[j];
+			Aq[i] += (*this) (i, j) * solution_[j];
 		}
 	}
 
@@ -225,4 +238,27 @@ double FEMsolver::computeResidualNorm()
 	bNorm = sqrt(bNorm);
 
 	return diff / bNorm;
+}
+
+void FEMsolver::printGlobalA() const
+{
+	int n = mesh_->getNumNodes();
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			if (abs(j - i) > matrix_bandwidth_) std::cout << 0 << " ";
+			else std::cout << (*this)(i, j) << " ";
+		}
+		std::cout << std::endl;
+	}
+}
+
+void FEMsolver::printGlobalb() const
+{
+	int n = mesh_->getNumNodes();
+	for (int i = 0; i < n; i++)
+	{
+		std::cout << global_b_[i] << std::endl;
+	}
 }

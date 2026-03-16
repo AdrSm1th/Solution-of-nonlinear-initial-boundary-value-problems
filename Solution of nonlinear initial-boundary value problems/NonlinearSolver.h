@@ -7,9 +7,9 @@
 
 struct SolverParams
 {
-	double tolerance = 1e-15;
-	int max_iterations = 1000;
-	double omega = 0.5f;
+	double tolerance = 1e-16;
+	int max_iterations = 500;
+	double omega = 1;
 };
 
 class NonlinearSolver

@@ -40,7 +40,7 @@ public:
 		assembler_ = &LA;
 		basis_ = &BS;
 		int n = mesh_->getNumNodes();
-		matrix_bandwidth_ = 3;
+		matrix_bandwidth_ = 2;
 		global_A_.resize(n * (2 * matrix_bandwidth_ + 1));
 		global_b_.resize(n);
 		solution_.resize(n);
@@ -55,4 +55,7 @@ public:
 	std::vector<double> getSolution() const;
 
 	double computeResidualNorm();
+
+	void printGlobalA() const;
+	void printGlobalb() const;
 };
