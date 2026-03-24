@@ -58,4 +58,5 @@ public:
 
 	void printGlobalA() const;
 	void printGlobalb() const;
+	void printSolution() const;
 };

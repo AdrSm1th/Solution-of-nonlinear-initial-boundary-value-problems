@@ -38,4 +38,5 @@ public:
 	double f(double x) const;
 	double lambda(double u) const;
 	double gamma();
+	double analyticalSolution(double x) const;
 };

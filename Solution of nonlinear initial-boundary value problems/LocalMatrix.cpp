@@ -32,37 +32,25 @@ LocalMatrices LocalAssembler::simpleIteration(int elem_id, const std::vector<dou
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			//G component
-			for (int ig = 0; ig < 3; ig++)
+			for (int k = 0; k < 3; k++)
 			{
 				double u_h = 0;
-				double xi = (2 * x[ig] - (x1 + x3)) / (x3 - x1);
+				double xi = (2 * x[k] - (x1 + x3)) / (x3 - x1);
 				std::vector<double> psi = basis_->evaluateBasis(xi);
 				std::vector<double> dpsi_dx = basis_->evalueteDerivatives(xi);
 
 				for (int jg = 0; jg < 3; jg++)
 				{
-					//double qa = (2 * q[elem_nodes[jg]] - (x1 + x3)) / (x3 - x1);
-					//u_h += qa * psi[jg];
 					u_h += q[elem_nodes[jg]] * psi[jg];
 				}
-
-				matrices.A[i * 3 + j] += mesh_->lambda(u_h) * dpsi_dx[i] * dpsi_dx[j] * w[ig] * (2 / h);
+				//G component
+				matrices.A[i * 3 + j] += mesh_->lambda(u_h) * dpsi_dx[i] * dpsi_dx[j] * w[k] * (2 / h);
+				//M component
+				matrices.A[i * 3 + j] += mesh_->gamma() * psi[i] * psi[j] * w[k] * (h / 2);
 			}
-			//matrices.A[i * 3 + j] *= (2 / h);
-
-			//M component
-			for (int im = 0; im < 3; im++)
-			{
-				double xi = (2 * x[im] - (x1 + x3)) / (x3 - x1);
-				std::vector<double> psi = basis_->evaluateBasis(xi);
-				std::vector<double> dpsi_dx = basis_->evalueteDerivatives(xi);
-				matrices.A[i * 3 + j] += mesh_->gamma() * psi[i] * psi[j] * w[im] * (h / 2);
-			}
-			//matrices.A[i * 3 + j] *= J;
-			//matrices.A[i * 3 + j] *= (h / 2);
 		}
 
+		//b component
 		for (int iF = 0; iF < 3; iF++)
 		{
 			double xi = (2 * x[iF] - (x1 + x3)) / (x3 - x1);
@@ -70,7 +58,6 @@ LocalMatrices LocalAssembler::simpleIteration(int elem_id, const std::vector<dou
 			std::vector<double> dpsi_dx = basis_->evalueteDerivatives(xi);
 			matrices.b[i] += mesh_->f(x[iF]) * psi[i] * w[iF];
 		}
-		//matrices.b[i] *= J;
 		matrices.b[i] *= (h / 2);
 	}
 

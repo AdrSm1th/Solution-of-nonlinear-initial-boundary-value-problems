@@ -18,7 +18,8 @@ bool Mesh::readMesh(const std::string& filename)
 	int idx = 0;
 	while(idx + 2 < n_)
 	{
-		elements_.push_back({ idx++, idx++, idx });
+		elements_.push_back({ idx, idx + 1, idx + 2 });
+		idx += 2;
 	}
 
 	input >> left_.type >> right_.type;
@@ -99,6 +100,8 @@ BoundaryCondition Mesh::getBoundaryCondition(bool left) const { return left ? le
 
 double Mesh::lambda(double u) const { return u; }
 
-double Mesh::f(double x) const { return -1 + x; }
+double Mesh::f(double x) const { return -5 * x * x; }
 
 double Mesh::gamma() { return gamma_; }
+
+double Mesh::analyticalSolution(double x) const { return x * x; }

@@ -1,5 +1,7 @@
 //FEMsolver.cpp
 
+#include <fstream>
+#include <iomanip>
 #include "FEMsolver.h"
 
 int FEMsolver::index(int i, int j) const
@@ -130,7 +132,7 @@ void FEMsolver::applyBoundaryCondition()
 
 bool FEMsolver::solveLU()
 {
-	std::vector<double> matrix_copy = global_A_;
+	//std::vector<double> matrix_copy = global_A_;
 
 	int n = mesh_->getNumNodes();
 	for (int k = 0; k < n; ++k) 
@@ -192,7 +194,7 @@ bool FEMsolver::solveLU()
 		solution_[i] = (y[i] - sum) / (*this)(i, i);
 	}
 
-	global_A_ = matrix_copy;
+	//global_A_ = matrix_copy;
 
 	return true;
 }
@@ -252,5 +254,17 @@ void FEMsolver::printGlobalb() const
 	for (int i = 0; i < n; i++)
 	{
 		std::cout << global_b_[i] << std::endl;
+	}
+}
+
+void FEMsolver::printSolution() const
+{
+	std::ofstream output("output.txt");
+	output << std::setprecision(16) << std::fixed;
+	output << "q" << std::setw(30) << "q*" << std::setw(30) << "q - q*\n";
+	for (int i = 0; i < mesh_->getNumNodes(); i++)
+	{
+		double q = mesh_->analyticalSolution(mesh_->getNodeCoord(i));
+		output << q << std::setw(29) << solution_[i] << std::setw(25) << q - solution_[i] << std::endl;
 	}
 }

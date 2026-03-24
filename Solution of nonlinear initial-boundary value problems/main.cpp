@@ -23,10 +23,7 @@ int main()
    //std::vector<double> q_predict{ 0, 0.5, 1 };
    nonlinearSolver.setInitialGuess(q_predict);
    std::vector<double> q = nonlinearSolver.solveNonlinear();
-   for (int i = 0; i < q.size(); i++)
-   {
-      std::cout << q[i] << std::endl;
-   }
+   FEMsolver.printSolution();
 
    return 0;
 }
