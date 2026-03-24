@@ -26,9 +26,9 @@
 
 std::vector<double> BasisFunction::evaluateBasis(double xi) const
 {
-	double N1 = xi * (xi - 1) / 2;
+	double N1 = 0.5 * xi * (xi - 1);
 	double N2 = 1 - xi * xi;
-	double N3 = xi * (xi + 1) / 2;
+	double N3 = 0.5 * xi * (xi + 1);
 	return { N1, N2, N3 };
 }
 

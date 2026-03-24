@@ -17,8 +17,9 @@ int main()
    LocalAssembler assembler(mesh, basis);
    FEMsolver FEMsolver(mesh, assembler, basis);
    NonlinearSolver nonlinearSolver(FEMsolver);
-   //std::vector<double> q_predict(mesh.getNumNodes(), 0.5);
-   std::vector<double> q_predict{0, 0.25, 0.5, 0.75, 1};
+   std::vector<double> q_predict(mesh.getNumNodes(), 0.1);
+   //std::vector<double> q_predict{0, 0.2, 0.5, 0.7, 1};
+   //std::vector<double> q_predict{0, 0.25, 0.5, 0.75, 1};
    //std::vector<double> q_predict{ 0, 0.5, 1 };
    nonlinearSolver.setInitialGuess(q_predict);
    std::vector<double> q = nonlinearSolver.solveNonlinear();

@@ -8,11 +8,13 @@ std::vector<double> NonlinearSolver::solveNonlinear()
    int n = q_prev_.size();
    q_curr_.resize(n);
 
+   fem_solver_->assembleGlobalSystem(q_prev_);
+   fem_solver_->applyBoundaryCondition();
+
    for (int k = 0; k < params_.max_iterations; k++)
    {
-      fem_solver_->assembleGlobalSystem(q_prev_);
-      fem_solver_->applyBoundaryCondition();
-
+      //fem_solver_->printGlobalA();
+      //fem_solver_->printGlobalb();
       if (!fem_solver_->solveLU())
       {
          std::cerr << "LU decomposition failed at iteration " << k << std::endl;

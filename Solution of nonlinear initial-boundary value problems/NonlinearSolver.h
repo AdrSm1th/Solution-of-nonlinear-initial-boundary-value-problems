@@ -7,7 +7,7 @@
 
 struct SolverParams
 {
-	double tolerance = 1e-16;
+	double tolerance = 1e-15;
 	int max_iterations = 500;
 	double omega = 1;
 };

@@ -14,11 +14,11 @@ bool Mesh::readMesh(const std::string& filename)
 		return false;
 	}
 	nodes_.resize(n_);
-	elements_.resize(n_ - 2);
 
-	for (int i = 0; i < n_ - 2; i++)
+	int idx = 0;
+	while(idx + 2 < n_)
 	{
-		elements_[i] = { i, i + 1, i + 2 };
+		elements_.push_back({ idx++, idx++, idx });
 	}
 
 	input >> left_.type >> right_.type;
@@ -87,7 +87,7 @@ void Mesh::generateUniformMesh()
 
 int Mesh::getNumNodes() const { return n_; }
 
-int Mesh::getNumElems() const { return n_ - 2; }
+int Mesh::getNumElems() const { return elements_.size(); }
 
 double Mesh::getNodeCoord(int node_id) const { return nodes_[node_id]; }
 
@@ -97,7 +97,7 @@ bool Mesh::isBoundary(int node_id) const { return node_id == 0 || node_id == n_ 
 
 BoundaryCondition Mesh::getBoundaryCondition(bool left) const { return left ? left_ : right_; }
 
-double Mesh::lambda(double u) const { return 1 + u; }
+double Mesh::lambda(double u) const { return u; }
 
 double Mesh::f(double x) const { return -1 + x; }
 

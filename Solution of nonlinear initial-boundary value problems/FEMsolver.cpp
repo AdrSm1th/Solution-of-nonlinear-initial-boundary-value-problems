@@ -55,14 +55,6 @@ void FEMsolver::applyBoundaryCondition()
 				{
 					if (std::abs(j - idx) <= matrix_bandwidth_) (*this)(idx, j) = 0;
 				}
-				for (int i = 0; i < n; i++)
-				{
-					if (std::abs(i - idx) <= matrix_bandwidth_)
-					{
-						global_b_[i] -= (*this)(i, idx) * cond.u_g;
-						(*this)(i, idx) = 0;
-					}
-				}
 				(*this)(idx, idx) = 1;
 				global_b_[idx] = cond.u_g;
 

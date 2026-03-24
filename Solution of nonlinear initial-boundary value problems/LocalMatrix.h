@@ -25,5 +25,5 @@ public:
 		basis_ = &basis;
 	}
 
-	LocalMatrices simpleIteration(int elem_id, const std::vector<double> &q_local);
+	LocalMatrices simpleIteration(int elem_id, const std::vector<double> &q);
 };
