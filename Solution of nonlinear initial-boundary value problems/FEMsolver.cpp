@@ -210,10 +210,10 @@ void FEMsolver::printSolution() const
 {
 	std::ofstream output("output.txt");
 	output << std::setprecision(16) << std::fixed;
-	output << "q" << std::setw(30) << "q*" << std::setw(30) << "q - q*\n";
+	output << "x" << std::setw(29) << "q" << std::setw(30) << "q*" << std::setw(30) << "q - q*\n";
 	for (int i = 0; i < mesh_->getNumNodes(); i++)
 	{
 		double q = mesh_->analyticalSolution(mesh_->getNodeCoord(i));
-		output << q << std::setw(29) << solution_[i] << std::setw(25) << q - solution_[i] << std::endl;
+		output << mesh_->getNodeCoord(i) << std::setw(29) << q << std::setw(29) << solution_[i] << std::setw(25) << q - solution_[i] << std::endl;
 	}
 }
