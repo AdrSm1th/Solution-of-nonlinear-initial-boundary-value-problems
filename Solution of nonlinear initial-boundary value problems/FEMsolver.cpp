@@ -71,7 +71,7 @@ void FEMsolver::applyBoundaryCondition()
 
 			case 3:
 			{
-				global_A_[idx * 2 + idx] += cond.beta;
+				(*this)(idx, idx) += cond.beta;
 				global_b_[idx] += cond.beta * cond.u_beta;
 				break;
 			}
