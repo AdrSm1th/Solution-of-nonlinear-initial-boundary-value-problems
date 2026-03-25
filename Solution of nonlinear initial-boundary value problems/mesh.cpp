@@ -13,6 +13,12 @@ bool Mesh::readMesh(const std::string& filename)
 		std::cout << "number of nodes must be more than 3\n";
 		return false;
 	}
+	if (n_ % 2 == 0)
+	{
+		std::cout << "number of nodes must be odd\n";
+		return false;
+	}
+
 	nodes_.resize(n_);
 
 	int idx = 0;
