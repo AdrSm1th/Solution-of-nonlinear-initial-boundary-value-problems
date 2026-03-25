@@ -62,68 +62,17 @@ void FEMsolver::applyBoundaryCondition()
 
 				break;
 			}
+
 			case 2:
 			{
-				int eidx = left ? 0 : mesh_->getNumElems() - 1;
-				auto elem_nodes = mesh_->getElementNodes(eidx);
-
-				double x1 = mesh_->getNodeCoord(elem_nodes[0]);
-				double x2 = mesh_->getNodeCoord(elem_nodes[1]);
-				double x3 = mesh_->getNodeCoord(elem_nodes[2]);
-
-				std::vector<double> x(3), w(3);
-
-				const std::vector<double> gauss_w = { 0.555555555555556, 0.888888888888889, 0.555555555555556 };
-
-				x[0] = (x1 + x3) / 2 - (x3 - x1) / 2 * 0.774596669241483;
-				x[1] = (x1 + x3) / 2;
-				x[2] = (x1 + x3) / 2 + (x3 - x1) / 2 * 0.774596669241483;
-
-				w[0] = 0.555555555555556;
-				w[1] = 0.888888888888889;
-				w[2] = 0.555555555555556;
-
-				int local_idx = left ? 0 : 2;
-				for (int i = 0; i < 3; i++)
-				{
-					double xi = (2 * x[i] - (x1 + x3)) / (x3 - x1);
-					std::vector<double> psi = basis_->evaluateBasis(xi);
-					global_b_[idx] += cond.theta * psi[local_idx] * w[i] * ((x3 - x1) / 2);
-				}
-
+				global_b_[idx] += cond.theta;
 				break;
 			}
 
 			case 3:
 			{
-				auto elem_nodes = mesh_->getElementNodes(idx);
-
-				double x1 = mesh_->getNodeCoord(elem_nodes[0]);
-				double x2 = mesh_->getNodeCoord(elem_nodes[1]);
-				double x3 = mesh_->getNodeCoord(elem_nodes[2]);
-
-				std::vector<double> x(3), w(3);
-
-				const std::vector<double> gauss_w = { 0.555555555555556, 0.888888888888889, 0.555555555555556 };
-
-				x[0] = (x1 + x3) / 2 - (x3 - x1) / 2 * 0.774596669241483;
-				x[1] = (x1 + x3) / 2;
-				x[2] = (x1 + x3) / 2 + (x3 - x1) / 2 * 0.774596669241483;
-
-				w[0] = (x3 - x1) / 2 * 0.555555555555556;
-				w[1] = (x3 - x1) / 2 * 0.888888888888889;
-				w[2] = (x3 - x1) / 2 * 0.555555555555556;
-
-				int local_idx = (idx == elem_nodes[0]) ? 0 :
-					(idx == elem_nodes[1]) ? 1 : 2;
-				for (int i = 0; i < 3; i++)
-				{
-					double xi = (2 * x[i] - (x1 + x3)) / (x3 - x1);
-					std::vector<double> psi = basis_->evaluateBasis(xi);
-					(*this) (idx, idx) += cond.beta * psi[i] * psi[local_idx] * w[i];
-					global_b_[idx] += cond.u_beta * cond.beta * psi[local_idx] * w[i];
-				}
-
+				global_A_[idx * 2 + idx] += cond.beta;
+				global_b_[idx] += cond.beta * cond.u_beta;
 				break;
 			}
 		}
