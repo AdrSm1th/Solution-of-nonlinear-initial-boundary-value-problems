@@ -38,6 +38,29 @@ void FEMsolver::assembleGlobalSystem(const std::vector<double> &q_current)
 	}
 }
 
+void FEMsolver::assembleNewtonSystem(const std::vector<double> &q_current)
+{
+	std::fill(global_A_.begin(), global_A_.end(), 0.0);
+	std::fill(global_b_.begin(), global_b_.end(), 0.0);
+
+	for (int elem = 0; elem < mesh_->getNumElems(); ++elem)
+	{
+		LocalMatrices matrices = assembler_->newtonIteration(elem, q_current);
+		std::vector<int> elem_nodes = mesh_->getElementNodes(elem);
+
+		for (int i = 0; i < 3; ++i)
+		{
+			int i_global = elem_nodes[i];
+			for (int j = 0; j < 3; ++j)
+			{
+				int j_global = elem_nodes[j];
+				(*this)(i_global, j_global) += matrices.A[i * 3 + j];
+			}
+			global_b_[i_global] += matrices.b[i];
+		}
+	}
+}
+
 void FEMsolver::applyBoundaryCondition()
 {
 	BoundaryCondition left = mesh_->getBoundaryCondition(true);

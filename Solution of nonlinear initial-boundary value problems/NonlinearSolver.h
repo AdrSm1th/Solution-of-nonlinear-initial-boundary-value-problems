@@ -7,8 +7,8 @@
 
 struct SolverParams
 {
-	double tolerance = 1e-15;
-	int max_iterations = 500;
+	double tolerance = 1e-13;
+	int max_iterations = 1000;
 	double omega = 1;
 };
 
@@ -27,4 +27,5 @@ public:
 	}
 	std::vector<double> solveNonlinear();
 	void setInitialGuess(const std::vector<double> &q0);
+	std::vector<double> solveNewton();
 };

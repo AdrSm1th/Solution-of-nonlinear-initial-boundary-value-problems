@@ -104,9 +104,11 @@ bool Mesh::isBoundary(int node_id) const { return node_id == 0 || node_id == n_ 
 
 BoundaryCondition Mesh::getBoundaryCondition(bool left) const { return left ? left_ : right_; }
 
-double Mesh::lambda(double u) const { return 1; }
+double Mesh::lambda(double u) const { return exp(u); }
 
-double Mesh::f(double x) const { return 0; }
+double Mesh::lambda_derivative(double u) const { return exp(u); }
+
+double Mesh::f(double x) const { return -exp(x) + x; }
 
 double Mesh::gamma() { return gamma_; }
 
