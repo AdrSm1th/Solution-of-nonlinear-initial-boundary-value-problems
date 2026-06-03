@@ -26,4 +26,5 @@ public:
 	}
 
 	LocalMatrices simpleIteration(int elem_id, const std::vector<double> &q);
+	LocalMatrices newtonIteration(int elem_id, const std::vector<double> &q);
 };

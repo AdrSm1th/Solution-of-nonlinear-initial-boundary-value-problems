@@ -38,6 +38,36 @@ void FEMsolver::assembleGlobalSystem(const std::vector<double> &q_current)
 	}
 }
 
+void FEMsolver::assembleNewtonSystem(const std::vector<double> &q_current)
+{
+	std::fill(global_A_.begin(), global_A_.end(), 0.0);
+	std::fill(global_b_.begin(), global_b_.end(), 0.0);
+
+	for (int elem = 0; elem < mesh_->getNumElems(); elem++)
+	{
+		LocalMatrices matrices = assembler_->newtonIteration(elem, q_current);
+		std::vector<int> elem_nodes = mesh_->getElementNodes(elem);
+
+		for (int i = 0; i < 3; i++)
+		{
+			int i_global = elem_nodes[i];
+
+			for (int j = 0; j < 3; j++)
+			{
+				int j_global = elem_nodes[j];
+				(*this)(i_global, j_global) += matrices.A[i * 3 + j];
+			}
+
+			global_b_[i_global] += matrices.b[i];
+		}
+	}
+}
+
+void FEMsolver::setSolution(const std::vector<double> &q)
+{
+	solution_ = q;
+}
+
 void FEMsolver::applyBoundaryCondition()
 {
 	BoundaryCondition left = mesh_->getBoundaryCondition(true);
@@ -53,12 +83,29 @@ void FEMsolver::applyBoundaryCondition()
 		{
 			case 1:
 			{
-				for (int j = 0; j < n; j++) 
+				double value = cond.u_g;
+
+				for (int i = 0; i < n; i++)
 				{
-					if (std::abs(j - idx) <= matrix_bandwidth_) (*this)(idx, j) = 0;
+					if (i == idx) continue;
+
+					if (std::abs(i - idx) <= matrix_bandwidth_)
+					{
+						global_b_[i] -= (*this)(i, idx) * value;
+						(*this)(i, idx) = 0.0;
+					}
 				}
-				(*this)(idx, idx) = 1;
-				global_b_[idx] = cond.u_g;
+
+				for (int j = 0; j < n; j++)
+				{
+					if (std::abs(j - idx) <= matrix_bandwidth_)
+					{
+						(*this)(idx, j) = 0.0;
+					}
+				}
+
+				(*this)(idx, idx) = 1.0;
+				global_b_[idx] = value;
 
 				break;
 			}

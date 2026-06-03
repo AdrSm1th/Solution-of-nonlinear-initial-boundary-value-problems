@@ -39,4 +39,5 @@ public:
 	double lambda(double u) const;
 	double gamma();
 	double analyticalSolution(double x) const;
+	double lambdaDerivative(double u) const;
 };

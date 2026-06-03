@@ -56,6 +56,10 @@ public:
 
 	double computeResidualNorm();
 
+	void assembleNewtonSystem(const std::vector<double> &q_current);
+
+	void setSolution(const std::vector<double> &q);
+
 	void printGlobalA() const;
 	void printGlobalb() const;
 	void printSolution() const;

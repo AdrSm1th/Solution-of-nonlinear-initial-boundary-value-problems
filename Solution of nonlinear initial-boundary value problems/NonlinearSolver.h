@@ -7,7 +7,7 @@
 
 struct SolverParams
 {
-	double tolerance = 1e-15;
+	double tolerance = 1e-14;
 	int max_iterations = 500;
 	double omega = 1;
 };
@@ -21,10 +21,14 @@ private:
 	std::vector<double> q_curr_;
 
 public:
-	NonlinearSolver(FEMsolver &solver)
+	NonlinearSolver(FEMsolver &solver, double w)
 	{
 		fem_solver_ = &solver;
+		params_.omega = w;
 	}
+
 	std::vector<double> solveNonlinear();
+	std::vector<double> solveNewton();
+
 	void setInitialGuess(const std::vector<double> &q0);
 };
