@@ -108,7 +108,7 @@
 
 	double Mesh::lambdaDerivative(double u) const { return 1 / u; }
 
-	double Mesh::f(double x) const { return -(1 / x) + gamma_ * x; }
+double Mesh::f(double x) const { return 0; }
 
 	double Mesh::gamma() { return gamma_; }
 

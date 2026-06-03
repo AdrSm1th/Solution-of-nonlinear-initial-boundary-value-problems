@@ -26,16 +26,9 @@ int main()
       //std::vector<double> q_predict{0, 0.2, 0.5, 0.7, 1};
       //std::vector<double> q_predict{0, 0.25, 0.5, 0.75, 1};
       //std::vector<double> q_predict{ 0, 0.5, 1 };
-      //nonlinearSolver.setInitialGuess(q_predict);
-      //std::vector<double> q = nonlinearSolver.solveNonlinear();
-      //std::vector<double> q = nonlinearSolver.solveNewton();
-      //FEMsolver.printSolution();
-
-      for (int i = 0; i <= 10; i++) {
-         NonlinearSolver nonlinearSolver(FEMsolver, 0.1 + 0.1 * i);
-         nonlinearSolver.setInitialGuess(q_predict);
-         std::vector<double> q = nonlinearSolver.solveNewton();
-      }
+      nonlinearSolver.setInitialGuess(q_predict);
+      std::vector<double> q = nonlinearSolver.solveNonlinear();
+      FEMsolver.printSolution();
    }
    return 0;
 }

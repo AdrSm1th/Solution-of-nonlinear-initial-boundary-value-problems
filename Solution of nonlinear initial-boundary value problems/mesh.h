@@ -37,6 +37,7 @@ public:
 	BoundaryCondition getBoundaryCondition(bool left) const;
 	double f(double x) const;
 	double lambda(double u) const;
+	double lambda_derivative(double u) const;
 	double gamma();
 	double analyticalSolution(double x) const;
 	double lambdaDerivative(double u) const;

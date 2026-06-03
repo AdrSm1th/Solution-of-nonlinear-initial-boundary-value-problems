@@ -47,6 +47,7 @@ public:
 	}
 
 	void assembleGlobalSystem(const std::vector<double> &q_current);
+	void assembleNewtonSystem(const std::vector<double> &q_current);
 
 	void applyBoundaryCondition();
 
@@ -63,4 +64,5 @@ public:
 	void printGlobalA() const;
 	void printGlobalb() const;
 	void printSolution() const;
+
 };

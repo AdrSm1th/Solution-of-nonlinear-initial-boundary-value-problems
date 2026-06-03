@@ -31,4 +31,5 @@ public:
 	std::vector<double> solveNewton();
 
 	void setInitialGuess(const std::vector<double> &q0);
+	std::vector<double> solveNewton();
 };
